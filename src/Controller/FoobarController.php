@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Foobar;
 use App\Form\FoobarType;
+use App\Form\FoobarData;
 use App\Repository\FoobarRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,12 +29,15 @@ class FoobarController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $foobar = new Foobar();
-        $form = $this->createForm(FoobarType::class, $foobar);
+        // form uses DTO
+        $foobarData = new FoobarData();
+        $form = $this->createForm(FoobarType::class, $foobarData);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            // create entity after form is valid and fill it with data from DTO
+            $foobar = $foobarData->fill(new Foobar());
             $em->persist($foobar);
             $em->flush();
 
@@ -41,7 +45,7 @@ class FoobarController extends AbstractController
         }
 
         return $this->render('foobar/new.html.twig', [
-            'foobar' => $foobar,
+            'foobar' => $foobarData,
             'form' => $form->createView(),
         ]);
     }
@@ -59,10 +63,15 @@ class FoobarController extends AbstractController
      */
     public function edit(Request $request, Foobar $foobar): Response
     {
-        $form = $this->createForm(FoobarType::class, $foobar);
+        // create DTO, passing entity for extraction
+        $foobarData = new FoobarData($foobar);
+        // pass DTO to form
+        $form = $this->createForm(FoobarType::class, $foobarData);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // fill form data into entity after form is valid
+            $foobar = $foobarData->fill($foobar);
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('foobar_edit', ['id' => $foobar->getId()]);
