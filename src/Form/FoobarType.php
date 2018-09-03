@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Foobar;
+use App\Entity\FoobarData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,7 +19,7 @@ class FoobarType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Foobar::class,
+            'data_class' => FoobarData::class,
         ]);
     }
 }
