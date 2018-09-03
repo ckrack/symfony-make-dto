@@ -1,0 +1,22 @@
+# EditorConfig helps developers define and maintain consistent
+# coding styles between different editors and IDEs
+# editorconfig.org
+
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# symfony configs
+[*.yaml]
+trim_trailing_whitespace = true
+indent_size = 4
+indent_style = space
+
+[{*.js,*.json,*.scss,*.css,*rc}]
+indent_size = 2
