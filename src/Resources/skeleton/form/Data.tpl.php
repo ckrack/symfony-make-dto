@@ -51,7 +51,7 @@ class <?= $class_name ?>
      * @param <?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>
 
      */
-    public function extract(<?= $bounded_class_name ?> $<?= $bounded_class_name ?>)
+    public function extract(<?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>): self
     {
 <?php foreach($fields as $propertyName => $mapping): ?>
         $this->set<?= Str::asCamelCase($propertyName) ?>($<?= lcfirst($bounded_class_name) ?>->get<?= Str::asCamelCase($propertyName) ?>());
