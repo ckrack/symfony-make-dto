@@ -43,6 +43,8 @@ class <?= $class_name ?>
             ->set<?= Str::asCamelCase($propertyName) ?>($this->get<?= Str::asCamelCase($propertyName) ?>())
 <?php endforeach; ?>
         ;
+
+        return $<?= lcfirst($bounded_class_name) ?>;
     }
 
     /**
@@ -56,6 +58,8 @@ class <?= $class_name ?>
 <?php foreach($fields as $propertyName => $mapping): ?>
         $this->set<?= Str::asCamelCase($propertyName) ?>($<?= lcfirst($bounded_class_name) ?>->get<?= Str::asCamelCase($propertyName) ?>());
 <?php endforeach; ?>
+
+        return $this;
     }
 <?php endif; ?>
 }
