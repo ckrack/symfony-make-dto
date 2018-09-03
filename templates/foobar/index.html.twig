@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Foobar index{% endblock %}
+
+{% block body %}
+    <h1>Foobar index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for foobar in foobars %}
+            <tr>
+                <td>{{ foobar.id }}</td>
+                <td>{{ foobar.name }}</td>
+                <td>
+                    <a href="{{ path('foobar_show', {'id': foobar.id}) }}">show</a>
+                    <a href="{{ path('foobar_edit', {'id': foobar.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('foobar_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Foobar{% endblock %}
+
+{% block body %}
+    <h1>Edit Foobar</h1>
+
+    {{ include('foobar/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('foobar_index') }}">back to list</a>
+
+    {{ include('foobar/_delete_form.html.twig') }}
+{% endblock %}
