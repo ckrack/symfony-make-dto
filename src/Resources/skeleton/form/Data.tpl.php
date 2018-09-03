@@ -22,7 +22,7 @@ class <?= $class_name ?>
      * @param <?= $bounded_class_name ?>|null $<?= lcfirst($bounded_class_name) ?>
 
      */
-    public function __construct(? <?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>)
+    public function __construct(? <?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?> = null)
     {
         if ($<?= lcfirst($bounded_class_name) ?> instanceof <?= $bounded_class_name ?>) {
             $this->extract($<?= lcfirst($bounded_class_name) ?>);
