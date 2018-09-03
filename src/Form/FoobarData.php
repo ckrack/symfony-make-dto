@@ -1,10 +1,14 @@
 <?php
-# this, except this comment is auto-generated code by the maker.
-# make:dto Foobar foobar / yes / yes (id omitted)
+
 namespace App\Form;
 
 use App\Entity\Foobar;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Data transfer object for Foobar.
+ * Add your constraints as annotations to the properties.
+ */
 class FoobarData
 {
     private $name;
@@ -14,7 +18,7 @@ class FoobarData
      *
      * @param Foobar|null $foobar
      */
-    public function __construct(? Foobar $foobar)
+    public function __construct(? Foobar $foobar = null)
     {
         if ($foobar instanceof Foobar) {
             $this->extract($foobar);
@@ -31,6 +35,8 @@ class FoobarData
         $foobar
             ->setName($this->getName())
         ;
+
+        return $foobar;
     }
 
     /**
@@ -38,9 +44,11 @@ class FoobarData
      *
      * @param Foobar $foobar
      */
-    public function extract(Foobar $Foobar)
+    public function extract(Foobar $foobar): self
     {
         $this->setName($foobar->getName());
+
+        return $this;
     }
 
     public function getName(): ?string
