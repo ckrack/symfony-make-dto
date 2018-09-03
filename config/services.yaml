@@ -29,3 +29,10 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+	# Use services from @maker for our dto maker
+    App\Maker\MakeDTO:
+        arguments:
+            $entityHelper: '@maker.doctrine_helper'
+            $fileManager: '@maker.file_manager'
+            $generator: '@maker.generator'
