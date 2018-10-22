@@ -20,13 +20,16 @@ use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Validation;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Bundle\MakerBundle\FileManager;
-use Symfony\Bundle\MakerBundle\Util\ClassSourceManipulator;
+use App\Maker\DTOClassSourceManipulator;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
@@ -36,15 +39,14 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 final class MakeDTO extends AbstractMaker
 {
     private $entityHelper;
+    private $fileManager;
 
     public function __construct(
         DoctrineHelper $entityHelper,
-        FileManager $fileManager,
-        Generator $generator = null
+        FileManager $fileManager
     ) {
         $this->entityHelper = $entityHelper;
         $this->fileManager = $fileManager;
-        //$this->generator = $generator;
     }
 
     public static function getCommandName(): string
@@ -58,8 +60,7 @@ final class MakeDTO extends AbstractMaker
             ->setDescription('Creates a new DTO class')
             ->addArgument('name', InputArgument::REQUIRED, sprintf('The name of the DTO class (e.g. <fg=yellow>%sData</>)', Str::asClassName(Str::getRandomTerm())))
             ->addArgument('bound-class', InputArgument::REQUIRED, 'The name of Entity that the DTO will be bound to')
-            //->addArgument('add-methods', InputArgument::OPTIONAL, 'Add fill/extract helper methods?', true)
-            ->setHelp(file_get_contents(__DIR__.'/../Resources/help/MakeDTO.txt'))
+            ->setHelp(file_get_contents(__DIR__.'/../Resources'.'/help/MakeDTO.txt'))
         ;
 
         $inputConf->setArgumentAsNonInteractive('bound-class');
@@ -131,10 +132,11 @@ final class MakeDTO extends AbstractMaker
             });
         }
 
+        // Skeleton?
+
         $DTOClassPath = $generator->generateClass(
             $formClassNameDetails->getFullName(),
-            // @ TODO change filename to relative
-            __DIR__.'/../Resources/skeleton/form/Data.tpl.php',
+            __DIR__.'/../Resources'.'/skeleton/form/Data.tpl.php',
             array_merge(
                 [
                     'fields' => $fields,
@@ -155,7 +157,30 @@ final class MakeDTO extends AbstractMaker
                 continue;
             }
 
-            $manipulator->addEntityField($fieldName, $mapping);
+            $annotationReader = new AnnotationReader();
+
+            // Lookup classname for inherited properties
+            if (array_key_exists('declared', $mapping)) {
+                $fullClassName = $mapping['declared'];
+            } else {
+                $fullClassName = $boundClassDetails->getFullName();
+            }
+
+            // Property Annotations
+            $reflectionProperty = new \ReflectionProperty($fullClassName, $fieldName);
+            $propertyAnnotations = $annotationReader->getPropertyAnnotations($reflectionProperty);
+
+            $comments = [];
+
+            foreach ($propertyAnnotations as $annotation) {
+                // we want to copy the asserts, so look for their interface
+                if($annotation instanceof Constraint) {
+                    $comments[] = $manipulator->buildAnnotationLine('@Assert\\'.(new \ReflectionClass($annotation))->getShortName(), (array) $annotation);
+                }
+            }
+
+            $manipulator->addEntityField($fieldName, $mapping, $comments);
+
         }
 
         $this->fileManager->dumpFile(
@@ -166,7 +191,7 @@ final class MakeDTO extends AbstractMaker
         $this->writeSuccessMessage($io);
 
         $io->text([
-            'Next: Add fields to your form and start using it.',
+            'Next: Create your form with this DTO and start using it.',
             'Find the documentation at <fg=yellow>https://symfony.com/doc/current/forms.html</>',
         ]);
     }
@@ -181,17 +206,14 @@ final class MakeDTO extends AbstractMaker
         );
     }
 
-    private function createClassManipulator(string $classPath): ClassSourceManipulator
+    private function createClassManipulator(string $classPath): DTOClassSourceManipulator
     {
-        return new ClassSourceManipulator(
+        return new DTOClassSourceManipulator(
             $this->fileManager->getFileContents($classPath),
-            // do not overwrite existing methods
-            false,
+            // overwrite existing methods
+            true,
             // use annotations
-            // if properties need to be generated then, by definition,
-            // some non-annotation config is being used, and so, the
-            // properties should not have annotations added to them
-            false
+            true
         );
     }
 
@@ -204,25 +226,6 @@ final class MakeDTO extends AbstractMaker
             array_keys($classMetadata->fieldMappings),
             array_keys($classMetadata->associationMappings)
         );
-
-        if ($classReflection) {
-            // exclude traits
-            $traitProperties = [];
-
-            foreach ($classReflection->getTraits() as $trait) {
-                foreach ($trait->getProperties() as $property) {
-                    $traitProperties[] = $property->getName();
-                }
-            }
-
-            $targetFields = array_diff($targetFields, $traitProperties);
-
-            // exclude inherited properties
-            $targetFields = array_filter($targetFields, function ($field) use ($classReflection) {
-                return $classReflection->hasProperty($field) &&
-                    $classReflection->getProperty($field)->getDeclaringClass()->getName() == $classReflection->getName();
-            });
-        }
 
         return $targetFields;
     }

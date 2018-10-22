@@ -35,4 +35,3 @@ services:
         arguments:
             $entityHelper: '@maker.doctrine_helper'
             $fileManager: '@maker.file_manager'
-            $generator: '@maker.generator'
