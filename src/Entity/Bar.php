@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\FoobarRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\BarRepository")
  */
-class Foobar
+class Bar extends Foo
 {
     /**
      * @ORM\Id()
@@ -21,22 +21,22 @@ class Foobar
      * @ORM\Column(type="string", length=255)
 	 * @Assert\NotBlank()
      */
-    private $name;
+    private $test;
+
+    public function getTest(): ?string
+    {
+        return $this->test;
+    }
+
+    public function setTest(string $test): self
+    {
+        $this->test = $test;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 }

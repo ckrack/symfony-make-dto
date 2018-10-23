@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Bar{% endblock %}
+
+{% block body %}
+    <h1>Create new Bar</h1>
+
+    {{ include('bar/_form.html.twig') }}
+
+    <a href="{{ path('bar_index') }}">back to list</a>
+{% endblock %}

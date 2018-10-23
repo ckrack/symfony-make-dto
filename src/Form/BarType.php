@@ -2,24 +2,25 @@
 
 namespace App\Form;
 
-use App\Entity\FoobarData;
+use App\Form\BarData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FoobarType extends AbstractType
+class BarType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('name')
+            ->add('test')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => FoobarData::class,
+            'data_class' => BarData::class,
         ]);
     }
 }

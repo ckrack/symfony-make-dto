@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bar index{% endblock %}
+
+{% block body %}
+    <h1>Bar index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Id</th>
+                <th>Test</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for bar in bars %}
+            <tr>
+                <td>{{ bar.name }}</td>
+                <td>{{ bar.id }}</td>
+                <td>{{ bar.test }}</td>
+                <td>
+                    <a href="{{ path('bar_show', {'id': bar.id}) }}">show</a>
+                    <a href="{{ path('bar_edit', {'id': bar.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('bar_new') }}">Create new</a>
+{% endblock %}
