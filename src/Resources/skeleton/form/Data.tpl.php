@@ -30,34 +30,50 @@ class <?= $class_name ?>
     }
 
     /**
-     * Fill model with data from the DTO.
+     * Fill entity with data from the DTO.
      *
      * @param <?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>
 
      */
-    public function fill(<?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>)
+    public function fill(<?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>): <?= $bounded_class_name ?>
     {
+<?php if ($addGettersSetters): ?>
+
         $<?= lcfirst($bounded_class_name) ?>
 
 <?php foreach($fields as $propertyName => $mapping): ?>
             ->set<?= Str::asCamelCase($propertyName) ?>($this->get<?= Str::asCamelCase($propertyName) ?>())
 <?php endforeach; ?>
         ;
+<?php else : ?>
+        $<?= lcfirst($bounded_class_name) ?>
+
+<?php foreach($fields as $propertyName => $mapping): ?>
+            ->set<?= Str::asCamelCase($propertyName) ?>($this-><?= $propertyName ?>)
+<?php endforeach; ?>
+        ;
+<?php endif; ?>
 
         return $<?= lcfirst($bounded_class_name) ?>;
     }
 
     /**
-     * Extract data from model into the DTO.
+     * Extract data from entity into the DTO.
      *
      * @param <?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>
 
      */
     public function extract(<?= $bounded_class_name ?> $<?= lcfirst($bounded_class_name) ?>): self
     {
+<?php if ($addGettersSetters): ?>
 <?php foreach($fields as $propertyName => $mapping): ?>
         $this->set<?= Str::asCamelCase($propertyName) ?>($<?= lcfirst($bounded_class_name) ?>->get<?= Str::asCamelCase($propertyName) ?>());
 <?php endforeach; ?>
+<?php else : ?>
+<?php foreach($fields as $propertyName => $mapping): ?>
+        $this-><?= $propertyName ?> = $<?= lcfirst($bounded_class_name) ?>->get<?= Str::asCamelCase($propertyName) ?>();
+<?php endforeach; ?>
+<?php endif; ?>
 
         return $this;
     }

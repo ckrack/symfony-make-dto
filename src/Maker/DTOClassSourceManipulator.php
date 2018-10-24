@@ -54,10 +54,11 @@ final class DTOClassSourceManipulator
 
     private $pendingComments = [];
 
-    public function __construct(string $sourceCode, bool $overwrite = false, bool $useAnnotations = true, bool $fluentMutators = true)
+    public function __construct(string $sourceCode, bool $overwrite = false, bool $useAnnotations = true, bool $fluentMutators = true, bool $addGettersSetters = true)
     {
         $this->overwrite = $overwrite;
         $this->useAnnotations = $useAnnotations;
+        $this->addGettersSetters = $addGettersSetters;
         $this->fluentMutators = $fluentMutators;
         $this->lexer = new Lexer\Emulative([
             'usedAttributes' => [
@@ -87,12 +88,16 @@ final class DTOClassSourceManipulator
         $typeHint = $this->getEntityTypeHint($columnOptions['type']);
         $nullable = $columnOptions['nullable'] ?? false;
         $isId = (bool) ($columnOptions['id'] ?? false);
-        //$comments[] = $this->buildAnnotationLine('@ORM\Column', $columnOptions);
         $defaultValue = null;
         if ('array' === $typeHint) {
             $defaultValue = new Node\Expr\Array_([], ['kind' => Node\Expr\Array_::KIND_SHORT]);
         }
         $this->addProperty($propertyName, $comments, $defaultValue);
+
+        // return early when setters/getters should not be added.
+        if (false === $this->addGettersSetters) {
+            return;
+        }
 
         $this->addGetter(
             $propertyName,
@@ -165,7 +170,15 @@ final class DTOClassSourceManipulator
             // we never overwrite properties
             return;
         }
-        $newPropertyBuilder = (new Builder\Property($name))->makePrivate();
+        $newPropertyBuilder = new Builder\Property($name);
+
+        // if we do not add getters/setters, the fields must be public
+        if (false === $this->addGettersSetters) {
+            $newPropertyBuilder->makePublic();
+        } else {
+            $newPropertyBuilder->makePrivate();
+        }
+
         if ($annotationLines && $this->useAnnotations) {
             $newPropertyBuilder->setDocComment($this->createDocBlock($annotationLines));
         }
