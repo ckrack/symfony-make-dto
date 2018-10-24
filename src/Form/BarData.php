@@ -14,12 +14,12 @@ class BarData
     /**
      * @Assert\NotBlank(message="This value should not be blank.", payload=null)
      */
-    private $name;
+    public $name;
 
     /**
      * @Assert\NotBlank(message="This value should not be blank.", payload=null)
      */
-    private $test;
+    public $test;
 
     /**
      * Create DTO, optionally extracting data from a model.
@@ -34,53 +34,29 @@ class BarData
     }
 
     /**
-     * Fill model with data from the DTO.
+     * Fill entity with data from the DTO.
      *
      * @param Bar $bar
      */
     public function fill(Bar $bar)
     {
         $bar
-            ->setName($this->getName())
-            ->setTest($this->getTest())
+            ->setName($this->name)
+            ->setTest($this->test)
         ;
 
         return $bar;
     }
 
     /**
-     * Extract data from model into the DTO.
+     * Extract data from entity into the DTO.
      *
      * @param Bar $bar
      */
     public function extract(Bar $bar): self
     {
-        $this->setName($bar->getName());
-        $this->setTest($bar->getTest());
-
-        return $this;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getTest(): ?string
-    {
-        return $this->test;
-    }
-
-    public function setTest(string $test): self
-    {
-        $this->test = $test;
+        $this->name = $bar->getName();
+        $this->test = $bar->getTest();
 
         return $this;
     }
