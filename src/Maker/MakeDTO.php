@@ -151,10 +151,11 @@ final class MakeDTO extends AbstractMaker
         );
 
         $generator->writeChanges();
-
         $manipulator = $this->createClassManipulator($DTOClassPath, $addGettersSetters);
-
         $mappedFields = $this->getMappedFieldsInEntity($metaData);
+
+        // Did we import assert annotations?
+        $assertionsImported = false;
 
         foreach ($fields as $fieldName => $mapping) {
             if (!\in_array($fieldName, $mappedFields)) {
@@ -179,6 +180,7 @@ final class MakeDTO extends AbstractMaker
             foreach ($propertyAnnotations as $annotation) {
                 // we want to copy the asserts, so look for their interface
                 if($annotation instanceof Constraint) {
+                    $assertionsImported = true;
                     $comments[] = $manipulator->buildAnnotationLine('@Assert\\'.(new \ReflectionClass($annotation))->getShortName(), (array) $annotation);
                 }
             }
@@ -192,6 +194,13 @@ final class MakeDTO extends AbstractMaker
         );
 
         $this->writeSuccessMessage($io);
+
+        if (true === $assertionsImported) {
+            $io->note([
+                'The maker imported assertion annotations.',
+                'Consider removing them from the entity or make sure to keep them updated in both places.',
+            ]);
+        }
 
         $io->text([
             'Next: Create your form with this DTO and start using it.',
